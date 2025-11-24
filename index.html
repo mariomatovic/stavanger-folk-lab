@@ -95,23 +95,25 @@ small.status { display:block; margin-top:8px; color:var(--subtle-text); }
   }
 
   .toggle-switch {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 4px;
-  }
+  display: flex;
+  width: 100%;
+  padding: 0;
+  gap: 6px;
+}
 
-  .toggle-switch button {
-    width: 100%;
-    text-align: center;
-  }
+.toggle-switch button {
+  flex: 1;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.25rem;
+  white-space: nowrap;
+}
 
-  .add-problem-btn {
-    display: block;
-    margin: 1rem auto 0 auto;
-    width: 100%;
-    text-align: center;
-  }
+.add-problem-btn {
+  margin: 0.75rem auto 0 auto;
+  width: auto;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.75rem;
+}
 
   .case-card {
     padding: 1rem;
@@ -492,4 +494,5 @@ document.addEventListener('DOMContentLoaded', main);
 </body>
 
 </html>
+
 
