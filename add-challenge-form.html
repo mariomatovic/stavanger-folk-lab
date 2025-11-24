@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Del en utfordring - Stavanger Folk Lab</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; line-height: 1.6; }
+        h1 { font-family: 'Source Serif Pro', serif; }
+        p { color: #333; }
+        .info { background-color: #f0f7ff; border-left: 4px solid #007AFF; padding: 1rem; margin: 2rem 0; }
+        a { color: #007AFF; font-weight: 600; }
+        form { margin-top: 2rem; }
+        label { font-weight: 600; display: block; margin-bottom: 0.5rem; }
+        input, textarea { width: 100%; box-sizing: border-box; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        button { background-color: #007AFF; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+        button:disabled { background-color: #999; }
+        #successMessage { display: none; color: #28a745; font-weight: bold; padding: 1rem; border: 1px solid #28a745; background-color: #e9f7ec; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Del en utfordring</h1>
+    <p>Har du en reell, anonymisert utfordring fra din organisasjon som du tror andre kan lære av? Beskriv den her. Godkjente bidrag vil bli kuratert og publisert i "Utfordringer fra Felleskapet"-seksjonen.</p>
+    
+    <div class="info">
+        <strong>Viktig:</strong> Vennligst ikke del sensitiv eller konfidensiell informasjon. Fokuser på den generelle problemstillingen.
+    </div>
+
+    <form id="challengeForm">
+        <!-- Hidden field to tell the script what kind of data this is -->
+        <input type="hidden" name="form_type" value="challenge">
+
+        <label for="title">Tittel på utfordringen (kort og presis)</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="situation">Situasjon (Beskriv problemet og konteksten)</label>
+        <textarea id="situation" name="situation" rows="6" required></textarea>
+
+        <label for="author">Ditt Navn / Rolle (Valgfritt, f.eks. "Leder, Olje & Gass")</label>
+        <input type="text" id="author" name="author">
+
+        <button type="submit" id="submitBtn">Send inn utfordring</button>
+    </form>
+
+    <div id="successMessage">
+        <h2>Takk!</h2>
+        <p>Din utfordring er mottatt og vil bli vurdert for publisering.</p>
+    </div>
+
+    <hr style="margin-top: 2rem;">
+    <p><a href="index.html">&larr; Tilbake til laben</a></p>
+
+    <script>
+        // --- IMPORTANT: Replace with your REAL Apps Script URL ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwMhF5SpEzXZPxjIte_lXccGQqpSLXU35CG3u-nePiUDrB5XJGAfdZVQUcW3jfCMSJf/exec';
+
+        document.getElementById('challengeForm' ).addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sender...';
+
+            const formData = new FormData(e.target);
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    document.getElementById('challengeForm').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'An unknown error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.textContent = 'Feil - Prøv igjen';
+                submitBtn.disabled = false;
+                alert('En feil oppstod. Vennligst prøv igjen.\n' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Legg til løsning - Stavanger Folk Lab</title>
+<style>
+#author-block { display: none; }
+body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; line-height: 1.6; }
+h1 { font-family: 'Source Serif Pro', serif; }
+p { color: #333; }
+a { color: #007AFF; font-weight: 600; }
+form { margin-top: 2rem; }
+label { font-weight: 600; display: block; margin-bottom: 0.5rem; }
+input, textarea { width: 100%; box-sizing: border-box; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+button { background-color: #007AFF; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+button:disabled { background-color: #999; }
+#successMessage { display: none; color: #28a745; font-weight: bold; padding: 1rem; border: 1px solid #28a745; background-color: #e9f7ec; border-radius: 5px; }
+.info { font-size:0.95rem; color:#666; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<h1>Legg til din løsning</h1>
+<p>Takk for at du vil bidra! Alle innsendte løsninger blir vurdert før publisering.</p>
+
+<form id="solutionForm">
+  <!-- Hidden fields -->
+  <input type="hidden" id="case_number" name="case_number">
+  <input type="hidden" id="form_type" name="form_type" value="solution">
+  <input type="hidden" id="username_field" name="username">
+
+  <div id="author-block">
+    <label for="author">Ditt Navn (eller "Anonym")</label>
+    <input type="text" id="author" name="author" required>
+    <label for="title">Din Tittel/Rolle (f.eks. "Student", "Leder, IT")</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+
+  <label for="solution">Din Løsning</label>
+  <textarea id="solution" name="solution" rows="8" required></textarea>
+
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button type="submit" id="submitBtn">Send inn løsning</button>
+    <div id="loggedInNotice" style="display:none; font-size:0.95rem; color:#666;"></div>
+  </div>
+</form>
+
+<div id="successMessage">
+  <h2>Takk!</h2>
+  <p>Din løsning er mottatt og vil bli vurdert for publisering.</p>
+</div>
+
+<hr style="margin-top: 2rem;">
+<p><a href="index.html">&larr; Tilbake til laben</a></p>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwMhF5SpEzXZPxjIte_lXccGQqpSLXU35CG3u-nePiUDrB5XJGAfdZVQUcW3jfCMSJf/exec';
+
+// Get case id from URL
+const urlParams = new URLSearchParams(window.location.search);
+const caseId = urlParams.get('case_id');
+const providedUsername = urlParams.get('username');
+
+if (caseId) {
+  document.getElementById('case_number').value = caseId;
+} else {
+  document.getElementById('solutionForm').innerHTML = '<p style="color: red;">Feil: Ingen case-ID funnet. Gå tilbake til hovedsiden og prøv igjen.</p>';
+}
+
+// Detect logged-in user state
+async function detectLoggedInUser() {
+  console.log('detectLoggedInUser started');
+  console.log('providedUsername:', providedUsername);
+  
+  try {
+    let username = providedUsername;
+
+    // Fallback to sessionStorage if username not in URL
+    if (!username) {
+      const stored = JSON.parse(sessionStorage.getItem('FolkLabUser') || 'null');
+      console.log('stored from session:', stored);
+      if (stored && stored.username) {
+        username = stored.username;
+      }
+    }
+
+    console.log('final username:', username);
+
+    if (!username) {
+      console.log('No username, showing author fields');
+      showAuthorFields();
+      return;
+    }
+
+    // Set username field for submission
+    document.getElementById('username_field').value = username;
+
+    // Fetch user data from server
+    console.log('Fetching user data...');
+    const res = await fetch(`${WEB_APP_URL}?form_type=lookup_user&username=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    console.log('Server response:', data);
+
+    if (data.result === 'success' && data.user) {
+      const user = data.user;
+      console.log('User found:', user);
+      
+      // Pre-fill author fields
+      document.getElementById('author').value = user.author_name || '';
+      document.getElementById('title').value = user.author_title || '';
+
+      // Hide author/title fields and show logged-in notice
+      console.log('Hiding author fields...');
+      hideAuthorFields(`Innlogget som: ${user.author_name} (${user.author_title || user.role || ''})`);
+    } else {
+      console.log('User not found in response');
+      showAuthorFields();
+    }
+  } catch (err) {
+    console.error('Error detecting logged-in user:', err);
+    showAuthorFields();
+  }
+}
+function hideAuthorFields(message) {
+  document.getElementById('author-block').style.display = 'none';
+  document.getElementById('loggedInNotice').style.display = 'block';
+  document.getElementById('loggedInNotice').textContent = message;
+  // Make fields not required (they're hidden and pre-filled)
+  document.getElementById('author').required = false;
+  document.getElementById('title').required = false;
+}
+
+function showAuthorFields() {
+  document.getElementById('author-block').style.display = 'block';
+  document.getElementById('loggedInNotice').style.display = 'none';
+  document.getElementById('username_field').value = '';
+  document.getElementById('author').required = true;
+  document.getElementById('title').required = true;
+}
+
+detectLoggedInUser();
+
+document.getElementById('solutionForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sender inn...';
+  
+  const formData = new FormData(this);
+  
+  console.log('Submitting form...');
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
+  }
+  
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+  console.log('Response:', data);
+  if (data.result === 'success') {
+    document.getElementById('solutionForm').style.display = 'none';
+    
+    // Check if user was logged in
+    const username = document.getElementById('username_field').value;
+    if (username) {
+      document.getElementById('successMessage').innerHTML = '<h2>Takk!</h2><p>Din løsning er publisert og vil vises umiddelbart på caset.</p>';
+    }
+    
+    document.getElementById('successMessage').style.display = 'block';
+  } else {
+      alert('Noe gikk galt: ' + (data.error || 'Ukjent feil'));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send inn løsning';
+    }
+  })
+  .catch(error => {
+    console.error('Full error:', error);
+    alert('Noe gikk galt. Prøv igjen senere.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send inn løsning';
+  });
+});
+</script>
+</body>
+</html>

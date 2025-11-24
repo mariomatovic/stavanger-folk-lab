@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stavanger Folk Lab | Et laboratorium for å bygge bedre team</title>
+<meta name="description" content="Et åpent laboratorium for å utforske og løse reelle utfordringer innen team- og kultur-utvikling i Stavanger-regionen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root { --bg-color: #ffffff; --text-color: #1a1a1a; --subtle-text: #666666; --accent-color: #007AFF; --border-color: #eaeaea; --card-hover-bg: #f7f7f7; --founder-bg: #f0f7ff; --fellow-bg: #f9f9f9; }
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-color ); color: var(--text-color); margin: 0; padding: 0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+header { text-align: center; margin-bottom: 2rem; position: relative; }
+header h1 { font-size: 2.5rem; font-weight: 700; margin: 0; }
+header p { font-family: 'Source Serif Pro', serif; font-size: 1.25rem; color: var(--subtle-text); margin-top: 0.5rem; }
+.header-links { position: absolute; top: 0; right: 0; display:flex; gap:12px; align-items:center; }
+.header-links a { font-size: 0.9rem; font-weight: 600; color: var(--subtle-text); text-decoration: none; cursor: pointer; }
+.header-links a.cta { color: var(--accent-color); border: 1px solid var(--accent-color); padding: 6px 10px; border-radius: 99px; background: transparent; }
+.lab-controls { text-align: center; margin-bottom: 3rem; }
+.toggle-switch { display: inline-flex; background-color: #eee; border-radius: 99px; padding: 5px; }
+.toggle-switch button { background: none; border: none; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; color: var(--subtle-text); cursor: pointer; border-radius: 99px; transition: all 0.2s; }
+.toggle-switch button.active { background-color: var(--accent-color); color: white; }
+.add-problem-btn { margin-left: 1rem; font-size: 0.9rem; font-weight: 600; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); padding: 0.5rem 1rem; border-radius: 99px; transition: all 0.2s; }
+.add-problem-btn:hover { background-color: var(--accent-color); color: white; }
+.case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; min-height: 200px; }
+.case-card { border: 1px solid var(--border-color); padding: 1.5rem; cursor: pointer; transition: all 0.2s; }
+.case-card:hover { background-color: var(--card-hover-bg); transform: translateY(-5px); }
+.case-card .case-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 1rem; }
+.case-card .case-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
+footer { text-align: center; margin-top: 5rem; padding: 2rem 0; font-size: 0.8rem; color: var(--subtle-text); }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 1000; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content { background: var(--bg-color); padding: 2rem; border: 1px solid var(--border-color); width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: all 0.3s; }
+.modal-overlay.active .modal-content { transform: scale(1); }
+.modal-content h2 { font-size: 0.8rem; font-weight: 700; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; margin-top: 0; }
+.modal-content h3 { font-family: 'Source Serif Pro', serif; font-size: 2rem; font-weight: 600; margin: 0.5rem 0 2rem 0; }
+.modal-content .section { margin-bottom: 2.5rem; }
+.modal-content .section p, .modal-content .section li { line-height: 1.8; font-size: 1.1rem; }
+.modal-close { position: fixed; top: 2rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--subtle-text); z-index: 1001; display: none; }
+.solution { border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem; }
+.solution.founder { background-color: var(--founder-bg); padding: 1.5rem; margin: 1.5rem -1.5rem 0 -1.5rem; border-top: 2px solid var(--accent-color); }
+.solution.fellow { background-color: var(--fellow-bg); padding: 1.5rem; margin: 1.5rem -1.5rem 0 -1.5rem; border-top: 1px solid #ccc; }
+.solution-author { font-weight: 700; font-size: 1rem; }
+.solution-author span { font-weight: 400; color: var(--subtle-text); font-style: italic; }
+.modal-buttons { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+.modal-btn { display: inline-block; background-color: var(--accent-color); color: white; padding: 0.75rem 1.5rem; text-decoration: none; font-weight: 600; border-radius: 5px; transition: all 0.2s; text-align: center; }
+.modal-btn.secondary { background-color: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); }
+.modal-btn:hover { background-color: #0056b3; color: white; }
+.discussion-explainer { font-size: 0.9rem; color: var(--subtle-text); margin-top: 1rem; }
+#loading-indicator { text-align: center; padding: 2rem; color: var(--subtle-text); }
+/* login styles */
+.login-form { max-width: 420px; margin: 0 auto; }
+.login-form label { display:block; font-weight:600; margin-bottom:6px; }
+.login-form input { width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
+.login-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+small.status { display:block; margin-top:8px; color:var(--subtle-text); }
+.user-badge { font-size:0.9rem; font-weight:600; color:var(--subtle-text); }
+.header-logout { cursor:pointer; color: var(--accent-color); text-decoration: underline; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-links">
+      <a id="about-link">Om Laben</a>
+      <a id="login-link" class="cta">Login</a>
+      <span id="logged-in-user" style="display:none;"></span>
+    </div>
+    <h1>Stavanger Folk Lab</h1>
+    <p>Et laboratorium for å bygge bedre team.</p>
+  </header>
+
+  <div class="lab-controls">
+    <div class="toggle-switch">
+      <button id="toggle-library" class="active">Biblioteket</button>
+      <button id="toggle-live">Utfordringer fra Felleskapet</button>
+    </div>
+    <a id="add-challenge-link" href="add-challenge-form.html" class="add-problem-btn">Del en utfordring</a>
+  </div>
+
+  <main>
+    <div class="case-grid" id="case-grid">
+      <div id="loading-indicator">Laster inn case-studier...</div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  &copy; 2025 Stavanger Folk Lab. Et uavhengig forskningsprosjekt.
+</footer>
+
+<!-- Modals -->
+<div class="modal-overlay" id="case-modal">
+  <div class="modal-content" id="modal-content-inner"></div>
+</div>
+
+<div class="modal-overlay" id="about-modal">
+  <div class="modal-content">
+    <div class="section">
+      <h2>Om Grunnleggeren</h2>
+      <p>Mitt navn er <strong>Mario Matovic</strong>. Med en bachelor i organisasjonsvitenskap og en master i biopsykologi, har jeg en genuin interesse for hva som får mennesker og team til å fungere godt sammen. Min erfaring spenner fra tekniske miljøer til prestasjons-coaching i idretten, hvor jeg lærte en fundamental sannhet: ekstraordinære resultater oppstår når et team deler en retning, ledere viser tillit, og kommunikasjonen er åpen.</p>
+      <p>Jeg startet Folk Lab som et personlig prosjekt for å anvende teori på reelle problemer og for å skape en felles arena for læring her i Stavanger. Hvis du trenger en konsulent for ditt team eller din organisasjon, kan du lære mer på <a href="https://mariomatovic.github.io/" target="_blank">min personlige nettside</a>.</p>
+    </div>
+    <div class="section">
+      <h2>Bli med i Laben</h2>
+      <p>Folk Lab er et åpent laboratorium. Det finnes to måter å bidra på:</p>
+      <ol>
+        <li><strong>Send inn en løsning:</strong> Alle kan foreslå en løsning på et case-studie via "Legg til løsning"-knappen.</li>
+        <li><strong>Bli en Lab Fellow:</strong> Jeg er alltid på utkikk etter respekterte ledere og fagpersoner for dypere involvering. Hvis dette er deg, <a href="mailto:mariomatovic@gmail.com">ta kontakt med meg direkte</a>.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- login modal -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-content">
+    <h2>Login</h2>
+    <div id="login-area">
+      <form id="loginForm" class="login-form" onsubmit="return false;">
+        <label for="login-username">Brukernavn</label>
+        <input id="login-username" name="username" type="text" autocomplete="username" required>
+
+        <label for="login-password">Passord</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+
+        <div class="login-actions">
+          <button id="loginCancel" type="button" class="modal-btn secondary">Avbryt</button>
+          <button id="loginSubmit" type="submit" class="modal-btn">Logg inn</button>
+        </div>
+        <small class="status" id="login-status"></small>
+      </form>
+    </div>
+    <div id="logged-in-area" style="display:none;">
+      <p>Du er logget inn som <span id="logged-in-name" class="user-badge"></span></p>
+      <p><span id="logged-in-role" class="user-badge"></span></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <a id="logoutBtn" class="modal-btn secondary">Logg ut</a>
+        <a id="closeLoginBtn" class="modal-btn">Lukk</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-close" id="modal-close">&times;</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwMhF5SpEzXZPxjIte_lXccGQqpSLXU35CG3u-nePiUDrB5XJGAfdZVQUcW3jfCMSJf/exec';
+const ADD_SOLUTION_FORM_URL = 'add-solution-form.html';
+const REQUEST_DISCUSSION_FORM_URL = 'YOUR_REQUEST_DISCUSSION_FORM_URL';
+
+const caseModal = document.getElementById('case-modal');
+const aboutModal = document.getElementById('about-modal');
+const loginModal = document.getElementById('login-modal');
+const modalCloseBtn = document.getElementById('modal-close');
+const grid = document.getElementById('case-grid');
+const toggleLibraryBtn = document.getElementById('toggle-library');
+const toggleLiveBtn = document.getElementById('toggle-live');
+const loadingIndicator = document.getElementById('loading-indicator');
+const aboutLink = document.getElementById('about-link');
+const loginLink = document.getElementById('login-link');
+const loginSubmit = document.getElementById('loginSubmit');
+const loginCancel = document.getElementById('loginCancel');
+const loginForm = document.getElementById('loginForm');
+const loginStatus = document.getElementById('login-status');
+const addChallengeLink = document.getElementById('add-challenge-link');
+
+let allData = { library: [], live: [], solutions: [] };
+
+function openModal(modalElement) {
+  modalElement.classList.add('active');
+  modalCloseBtn.style.display = 'block';
+}
+function closeModal() {
+  caseModal.classList.remove('active');
+  aboutModal.classList.remove('active');
+  loginModal.classList.remove('active');
+  modalCloseBtn.style.display = 'none';
+}
+
+function renderCases(cases) {
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (!cases || cases.length === 0) {
+    grid.innerHTML = '<p style="color: var(--subtle-text); text-align: center;">Ingen case-studier i denne seksjonen ennå.</p>';
+    return;
+  }
+  cases.forEach(caseData => {
+    const card = document.createElement('div');
+    card.className = 'case-card';
+    const isChallenge = String(caseData.case_number).startsWith('C');
+const label = isChallenge ? 'Fellesskap' : 'Bibliotek';
+card.innerHTML = `
+  <div class="case-number">${label} #${String(caseData.case_number).substring(1)}</div>
+  <div class="case-title">${caseData.title}</div>
+`;
+    card.addEventListener('click', () => openCaseModal(caseData));
+    grid.appendChild(card);
+  });
+}
+
+function openCaseModal(caseData) {
+  const modalContent = document.getElementById('modal-content-inner');
+  const caseSolutions = allData.solutions.filter(s => s.case_number === caseData.case_number);
+  let solutionsHtml = '';
+  caseSolutions
+    .sort((a, b) => (b.is_founder ? 1 : 0) - (a.is_founder ? 1 : 0) || (b.is_fellow ? 1 : 0) - (a.is_fellow ? 1 : 0))
+    .forEach(sol => {
+      let solutionClass = '';
+      if (sol.is_founder) solutionClass = 'founder';
+      else if (sol.is_fellow) solutionClass = 'fellow';
+      solutionsHtml += `
+        <div class="solution ${solutionClass}">
+          <p class="solution-author">${sol.author} <span>${sol.title}</span></p>
+          <p>${String(sol.solution).replace(/\n/g, '<br>')}</p>
+        </div>
+      `;
+    });
+
+  // Check if a user is logged in and prepare username query parameter
+  const user = JSON.parse(sessionStorage.getItem('FolkLabUser') || 'null');
+  const usernameParam = user ? `&username=${encodeURIComponent(user.username)}` : '';
+
+  modalContent.innerHTML = `
+    <h2>Case #${caseData.case_number}</h2>
+    <h3>${caseData.title}</h3>
+    <div class="section">
+      <h2>1. Situasjon</h2>
+      <p>${String(caseData.situation).replace(/\n/g, '<br>')}</p>
+    </div>
+    <div class="section">
+      <h2>2. Teoretisk Perspektiv</h2>
+      <p>${String(caseData.theory).replace(/\n/g, '<br>')}</p>
+    </div>
+    <div class="section">
+      <h2>3. Lignende Praksis</h2>
+      <p>${String(caseData.precedent).replace(/\n/g, '<br>')}</p>
+    </div>
+    <div class="section">
+      <h2>4. Foreslåtte Løsninger</h2>
+      ${solutionsHtml.length > 0 ? solutionsHtml : '<p>Ingen løsninger er foreslått ennå. Vær den første!</p>'}
+    </div>
+    <div class="modal-buttons">
+      <a href="${ADD_SOLUTION_FORM_URL}?case_id=${caseData.case_number}${usernameParam}" class="modal-btn">Legg til løsning</a>
+    </div>
+    <p class="discussion-explainer">Ved å be om en diskusjon, melder du din interesse for å delta i en liten, fasilitert gruppe for å drøfte dette caset dypere. Hvis nok interesse meldes, vil grunnlegger ta initiativ til å samle gruppen.</p>
+  `;
+  openModal(caseModal);
+}
+
+// --- LOGIN LOGIC ---
+
+function handleLogin(e) {
+    e.preventDefault();
+    const form = document.getElementById('loginForm');
+    const button = document.getElementById('loginSubmit');
+    const status = document.getElementById('login-status');
+    
+    button.disabled = true;
+    status.textContent = 'Logger inn...';
+
+    const formData = new FormData(form);
+    formData.append('form_type', 'login');
+
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.result === 'success' && data.user) {
+            sessionStorage.setItem('FolkLabUser', JSON.stringify(data.user));
+            updateLoginStatus();
+            closeModal();
+        } else {
+            throw new Error(data.error || 'Ugyldig brukernavn eller passord.');
+        }
+    })
+    .catch(error => {
+        status.textContent = error.message;
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
+}
+
+function handleLogout() {
+    sessionStorage.removeItem('FolkLabUser');
+    updateLoginStatus();
+    alert('Du er nå logget ut.');
+    closeModal();
+}
+
+function updateLoginStatus() {
+    const user = sessionStorage.getItem('FolkLabUser');
+    const loggedInUserSpan = document.getElementById('logged-in-user');
+    const loginLink = document.getElementById('login-link');
+
+    if (user) {
+        const userData = JSON.parse(user);
+        loginLink.style.display = 'none';
+        loggedInUserSpan.innerHTML = `${userData.author_name} (<a href="#" id="logout-link" class="header-logout">Logg ut</a>)`;
+        loggedInUserSpan.style.display = 'inline';
+        document.getElementById('logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            handleLogout();
+        });
+    } else {
+        loginLink.style.display = 'inline';
+        loggedInUserSpan.style.display = 'none';
+    }
+}
+
+function showLoginPrompt() {
+    document.getElementById('login-area').style.display = 'block';
+    document.getElementById('logged-in-area').style.display = 'none';
+    document.getElementById('login-status').textContent = '';
+    openModal(loginModal);
+}
+
+function showLoggedInModal(user) {
+    document.getElementById('logged-in-name').textContent = user.author_name;
+    document.getElementById('logged-in-role').textContent = user.author_title + (user.role ? ' — ' + user.role : '');
+    document.getElementById('login-area').style.display = 'none';
+    document.getElementById('logged-in-area').style.display = 'block';
+    openModal(loginModal);
+}
+
+// --- MODALS & EVENTS ---
+
+function initModalEvents() {
+  modalCloseBtn.addEventListener('click', closeModal);
+  caseModal.addEventListener('click', (e) => { if (e.target === caseModal) closeModal(); });
+  aboutModal.addEventListener('click', (e) => { if (e.target === aboutModal) closeModal(); });
+  loginModal.addEventListener('click', (e) => { if (e.target === loginModal) closeModal(); });
+}
+initModalEvents();
+
+// --- MAIN FUNCTION ---
+
+async function main() {
+    toggleLibraryBtn.addEventListener('click', () => {
+        renderCases(allData.library);
+        toggleLibraryBtn.classList.add('active');
+        toggleLiveBtn.classList.remove('active');
+    });
+    toggleLiveBtn.addEventListener('click', () => {
+        renderCases(allData.live);
+        toggleLiveBtn.classList.add('active');
+        toggleLibraryBtn.classList.remove('active');
+    });
+
+    aboutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(aboutModal);
+    });
+
+    loginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const user = JSON.parse(sessionStorage.getItem('FolkLabUser') || 'null');
+        if (user) {
+            showLoggedInModal(user);
+        } else {
+            showLoginPrompt();
+        }
+    });
+
+    loginForm.addEventListener('submit', handleLogin);
+    loginCancel.addEventListener('click', closeModal);
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    document.getElementById('closeLoginBtn').addEventListener('click', closeModal);
+
+    updateLoginStatus();
+
+    try {
+        const response = await fetch(WEB_APP_URL);
+        if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+        allData = await response.json();
+        renderCases(allData.library);
+        if(loadingIndicator) loadingIndicator.style.display = 'none';
+    } catch (error) {
+        console.error("Failed to fetch data:", error);
+        if(loadingIndicator) loadingIndicator.textContent = "Kunne ikke laste inn data. Prøv igjen senere.";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', main);
+</script>
+</body>
+</html>
