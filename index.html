@@ -69,6 +69,96 @@ footer { text-align: center; margin-top: 5rem; padding: 2rem 0; font-size: 0.8re
 small.status { display:block; margin-top:8px; color:var(--subtle-text); }
 .user-badge { font-size:0.9rem; font-weight:600; color:var(--subtle-text); }
 .header-logout { cursor:pointer; color: var(--accent-color); text-decoration: underline; font-weight:600; }
+/* --- MOBILE IMPROVEMENTS --- */
+@media (max-width: 600px) {
+
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  .header-links {
+    position: static;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .lab-controls {
+    margin-bottom: 2rem;
+  }
+
+  .toggle-switch {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 4px;
+  }
+
+  .toggle-switch button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .add-problem-btn {
+    display: block;
+    margin: 1rem auto 0 auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  .case-card {
+    padding: 1rem;
+  }
+
+  .case-card .case-title {
+    font-size: 1rem;
+  }
+
+  /* Modal + scrolling fixes */
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+    margin: 0;
+    padding: 1.25rem;
+  }
+
+  .modal-close {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .modal-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .modal-content p,
+  .modal-content li {
+    font-size: 1rem;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 1rem;
+  }
+
+  .modal-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Login form sizing */
+  .login-form input {
+    font-size: 1rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -402,3 +492,4 @@ document.addEventListener('DOMContentLoaded', main);
 </body>
 
 </html>
+
